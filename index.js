@@ -9,6 +9,7 @@ app.use(express.urlencoded({extended: false})) // Permitimos recibir datos de co
 // Utilizamos las rutas
 app.use(router)
 
+// Levantamos el servidor con el metodo listen de express
 app.listen(3000, (error) => {
   error ? console.log(error) : console.log('Server running');
 })
