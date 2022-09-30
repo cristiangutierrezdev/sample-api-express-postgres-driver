@@ -1,3 +1,5 @@
+const connect = require('../database')
+
 // req ---> recibe los datos de la peticion
 // res ---> responde al cliente
 // req.params ---> Recibimos los datos que llegan por la URL pero son obligatorios
@@ -5,35 +7,67 @@
 // req.body ---> Recibimos los datos que llegan en el body
 
 //  Controladores de Mascotas
-const crearMascota = (req, res) => {
-  console.log('crear mascota');
+const crearMascota = async (req, res) => {
+  const { nombre, tipo, raza, edad, propietario_id } = req.body
 
-  const nombre = req.body.nombre
-  const edad = req.body.edad
-  console.log(`El nombre de la mascota es ${nombre} y tiene ${edad} años.`);
+  try {
+    const dbResponse = await connect.query(
+      'INSERT INTO mascotas (nombre, tipo, raza, edad, propietario_id) VALUES ($1, $2, $3, $4, $5)',
+      [nombre, tipo, raza, edad, propietario_id]
+      )
 
-  res.status(201).send({
-    message: 'Tu mascota fue creada'
-  })
+      if(dbResponse.rowCount > 0){
+        res.status(201).send({
+          message: "Mascota creada" 
+        })
+      } else {
+        res.status(409).send({
+          message: "No se pudo crear la mascota en este momento." 
+        })
+      }
+
+  } catch (error) {
+    res.status(409).send({
+      error
+    })
+  }
 }
 
-const obtenerTodasMascotas = (req, res) => {
-  console.log('obtener todas las mascotas');
+const obtenerTodasMascotas = async (req, res) => {
+  try {
+    const dbResponse = await connect.query('SELECT * FROM mascotas')
 
-  res.status(200).send({
-    data: [
-      {
-        "name": 'Mascota 1'
-      },
-      {
-        "name": 'Mascota 1'
-      },
-    ]
-  })
+    res.status(200).send({
+      data: dbResponse.rows
+    })
+  } catch (error) {
+    res.status(404).send({
+      error
+    })
+  }
 }
 
-const obtenerMascota = (req, res) => {
-  console.log('obtener una mascota');
+const obtenerMascota = async (req, res) => {
+  const id = req.params.idMascota
+
+  try {
+    const dbResponse = await connect.query('SELECT * FROM mascotas WHERE id_mascota = $1', [id])
+
+    if(dbResponse.rowCount > 0) {
+      res.status(200).send({
+        data: dbResponse.rows
+      })
+    } else {
+      res.status(404).send({
+        message: 'Mascota no encontrada'
+      })
+    }
+
+  } catch (error) {
+    res.status(404).send({
+      error
+    })
+  }
 }
 
 const modificarMascota = (req, res) => {
@@ -44,7 +78,7 @@ const eliminarMascota = (req, res) => {
   console.log('eleminar mascota');
 }
 
-const apiController = (req, res)=>{
+const apiController = (req, res) => {
   res.status(200).send({
     mensaje: 'hola mundo'
   })
@@ -52,7 +86,7 @@ const apiController = (req, res)=>{
 
 // queries
 // localhost:3000/api/suma?num1=5&num2=10
-const apiSumaController = (req, res)=>{
+const apiSumaController = (req, res) => {
   const numeroUno = Number(req.query.num1)
   const numeroDos = Number(req.query.num2)
 
@@ -65,7 +99,7 @@ const apiSumaController = (req, res)=>{
 
 // params
 // localhost:3000/api/usuario/merlin
-const apiUsuarioController = (req, res) =>{
+const apiUsuarioController = (req, res) => {
   res.status(200).send({
     usuario: req.params.nombre
   })
