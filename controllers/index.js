@@ -70,12 +70,60 @@ const obtenerMascota = async (req, res) => {
   }
 }
 
-const modificarMascota = (req, res) => {
-  console.log('modificar mascota');
+const modificarMascota = async (req, res) => {
+  const id = req.params.idMascota
+  const { nombre, tipo, raza, edad, propietario_id } = req.body
+
+  try {
+    const dbResponse = await connect.query(`
+    UPDATE mascotas
+      SET
+        nombre = $1,
+        tipo = $2,
+        raza = $3,
+        edad = $4,
+        propietario_id = $5
+    WHERE id_mascota = $6`,
+    [nombre, tipo, raza, edad, propietario_id, id])
+
+    if(dbResponse.rowCount > 0){
+      res.status(200).send({
+        message: "Mascota modificada" 
+      })
+    } else {
+      res.status(409).send({
+        message: "No se pudo modificar la mascota en este momento." 
+      })
+    }
+
+  } catch (error) {
+    res.status(400).send({
+      error
+    })
+  }
 }
 
-const eliminarMascota = (req, res) => {
-  console.log('eleminar mascota');
+const eliminarMascota = async (req, res) => {
+  const id = req.params.idMascota
+
+  try {
+    const dbResponse = await connect.query(`DELETE FROM mascotas WHERE id_mascota = $1`, [id])
+
+    if(dbResponse.rowCount > 0){
+      res.status(200).send({
+        message: "Mascota eliminada" 
+      })
+    } else {
+      res.status(409).send({
+        message: "No se pudo eliminar la mascota en este momento." 
+      })
+    }
+
+  } catch (error) {
+    res.status(400).send({
+      error
+    })
+  }
 }
 
 const apiController = (req, res) => {
