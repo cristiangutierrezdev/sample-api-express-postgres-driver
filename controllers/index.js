@@ -14,17 +14,17 @@ const crearMascota = async (req, res) => {
     const dbResponse = await connect.query(
       'INSERT INTO mascotas (nombre, tipo, raza, edad, propietario_id) VALUES ($1, $2, $3, $4, $5)',
       [nombre, tipo, raza, edad, propietario_id]
-      )
+    )
 
-      if(dbResponse.rowCount > 0){
-        res.status(201).send({
-          message: "Mascota creada" 
-        })
-      } else {
-        res.status(409).send({
-          message: "No se pudo crear la mascota en este momento." 
-        })
-      }
+    if (dbResponse.rowCount > 0) {
+      res.status(201).send({
+        message: "Mascota creada"
+      })
+    } else {
+      res.status(409).send({
+        message: "No se pudo crear la mascota en este momento."
+      })
+    }
 
   } catch (error) {
     res.status(409).send({
@@ -53,7 +53,7 @@ const obtenerMascota = async (req, res) => {
   try {
     const dbResponse = await connect.query('SELECT * FROM mascotas WHERE id_mascota = $1', [id])
 
-    if(dbResponse.rowCount > 0) {
+    if (dbResponse.rowCount > 0) {
       res.status(200).send({
         data: dbResponse.rows
       })
@@ -84,15 +84,15 @@ const modificarMascota = async (req, res) => {
         edad = $4,
         propietario_id = $5
     WHERE id_mascota = $6`,
-    [nombre, tipo, raza, edad, propietario_id, id])
+      [nombre, tipo, raza, edad, propietario_id, id])
 
-    if(dbResponse.rowCount > 0){
+    if (dbResponse.rowCount > 0) {
       res.status(200).send({
-        message: "Mascota modificada" 
+        message: "Mascota modificada"
       })
     } else {
       res.status(409).send({
-        message: "No se pudo modificar la mascota en este momento." 
+        message: "No se pudo modificar la mascota en este momento."
       })
     }
 
@@ -109,13 +109,13 @@ const eliminarMascota = async (req, res) => {
   try {
     const dbResponse = await connect.query(`DELETE FROM mascotas WHERE id_mascota = $1`, [id])
 
-    if(dbResponse.rowCount > 0){
+    if (dbResponse.rowCount > 0) {
       res.status(200).send({
-        message: "Mascota eliminada" 
+        message: "Mascota eliminada"
       })
     } else {
       res.status(409).send({
-        message: "No se pudo eliminar la mascota en este momento." 
+        message: "No se pudo eliminar la mascota en este momento."
       })
     }
 
@@ -160,6 +160,57 @@ const apiBodyController = (req, res) => {
   res.status(200).send(data)
 }
 
+// Register
+const registerController = async (req, res) => {
+  const { email, password } = req.body
+
+  try {
+    const dbResponse = await connect.query(
+      "INSERT INTO admins(email, password) VALUES($1, crypt($2, gen_salt('bf')))",
+      [email, password]
+    )
+
+    if (dbResponse.rowCount > 0) {
+      res.status(201).send({
+        message: "Admin creado"
+      })
+    } else {
+      res.status(409).send({
+        message: "No se pudo crear el admin."
+      })
+    }
+  } catch (error) {
+    res.status(409).send({
+      error
+    })
+  }
+}
+
+const loginController = async (req, res) => {
+  const { email, bodyPassword } = req.body
+
+  try {
+    const dbResponse = await connect.query(
+      "SELECT * FROM admins WHERE email = $1 AND password = crypt($2, password)",
+      [email, bodyPassword]
+    )
+
+    if (dbResponse.rowCount > 0) {
+      res.status(200).send({
+        data: dbResponse.rows
+      })
+    } else {
+      res.status(404).send({
+        message: "Usuario o contraseña incorrectos."
+      })
+    }
+  } catch (error) {
+    res.status(404).send({
+      error
+    })
+  }
+}
+
 module.exports = {
   crearMascota,
   obtenerTodasMascotas,
@@ -169,5 +220,7 @@ module.exports = {
   apiController,
   apiSumaController,
   apiUsuarioController,
-  apiBodyController
+  apiBodyController,
+  registerController,
+  loginController
 }

@@ -8,7 +8,9 @@ const { crearMascota,
   apiController,
   apiSumaController,
   apiUsuarioController,
-  apiBodyController } = require('../controllers')
+  apiBodyController,
+  loginController,
+  registerController } = require('../controllers')
 
 // CRUD de mascotas
 router.post('/mascotas', crearMascota)
@@ -22,5 +24,9 @@ router.get('/api', apiController)
 router.get('/api/suma', apiSumaController)
 router.get('/api/usuario/:nombre', apiUsuarioController)
 router.put('/api/body', apiBodyController)
+
+// LOGIN
+router.post('/register', registerController)
+router.post('/login', loginController)
 
 module.exports = router
