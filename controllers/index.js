@@ -129,7 +129,7 @@ const eliminarMascota = async (req, res) => {
 
 const apiController = (req, res) => {
   res.status(200).send({
-    mensaje: 'hola mundo esto es un mensaje del ultimo dia'
+    mensaje: 'hola mundo esto es un mensaje'
   })
 }
 
