@@ -14,8 +14,8 @@ const { crearMascota,
   registerController } = require('../controllers')
 
 // CRUD de mascotas
-router.post('/mascotas', crearMascota)
-router.get('/mascotas', verifyToken, obtenerTodasMascotas)
+router.post('/mascotas', verifyToken, crearMascota)
+router.get('/mascotas', obtenerTodasMascotas)
 router.get('/mascotas/:idMascota', obtenerMascota)
 router.put('/mascotas/:idMascota', modificarMascota)
 router.delete('/mascotas/:idMascota', eliminarMascota)

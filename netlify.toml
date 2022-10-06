@@ -1,0 +1,7 @@
+[build]
+    functions="functions"
+
+[[redirects]]
+    to="/.netlify/functions/index"
+    from="/*"
+    status=200
